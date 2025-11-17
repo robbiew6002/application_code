@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>INVALID METHOD</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f8d7da;
+            color: #721c24;
+            padding: 2rem;
+        }
+        #error-message {
+            background: #fbeaea;
+            border: 1px solid #f5c6cb;
+            padding: 2rem;
+            border-radius: 8px;
+            max-width: 600px;
+            margin: auto;
+            text-align: center;
+        }
+        a.button {
+            display: inline-block;
+            background-color: #721c24;
+            color: white;
+            padding: 0.75rem 1.5rem;
+            margin: 0.5rem;
+            border-radius: 4px;
+            text-decoration: none;
+            font-weight: bold;
+        }
+        a.button:hover {
+            background-color: #501217;
+        }
+    </style>
+</head>
+<body>
+    <div id="error-message">
+        <h2>INVALID METHOD USED</h2>
+        <p>It seems you have attempted to use an HTTP method that is not configured for the given endpoint.</p>
+        <p>If you believe this is a fault in the site, feel free to use the contact form below:</p>
+        <a href="/contact" class="button">Contact</a>
+        <p>Alternatively, you can return home:</p>
+        <a href="/home" class="button">Home</a>
+    </div>
+</body>
+</html>

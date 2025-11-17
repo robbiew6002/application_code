@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>Request {{request.id}}</title>
+    <style>
+
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f5f6fa;
+        color: #333;
+    }
+    
+/* Basic page and container styling */
+#page {
+    max-width: 900px;
+    margin: 20px auto;
+    font-family: Arial, sans-serif;
+    color: #333;
+}
+
+/* Ticket details container */
+#ticket_details {
+    background: #f5f5f5;
+    padding: 20px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+}
+
+/* Style all note divs inside ticket_details whose ID starts with note_ */
+#ticket_details > div[id^="note_"] {
+    background: #fff;
+    border: 1px solid #ccc;
+    padding: 12px;
+    margin-bottom: 12px;
+    border-radius: 6px;
+}
+
+/* Note text */
+#ticket_details > div[id^="note_"] p {
+    margin: 0 0 6px 0;
+}
+
+/* Buttons style */
+button {
+    background-color: orange;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    padding: 8px 12px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-top: 6px;
+}
+
+button:hover {
+    background-color: darkorange;
+}
+
+/* Popups and forms — initially hidden */
+#note-form, #device-form, #customer-form, #user-form, 
+#delete-popup, #delete-note-popup, #reassign-popup, #close-popup {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 320px;
+    max-width: 90%;
+    background-color: #f0f0f0;
+    border: 2px solid #333;
+    border-radius: 8px;
+    padding: 20px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    z-index: 1000;
+}
+
+/* Input placeholders */
+input::placeholder, textarea::placeholder {
+    color: #666;
+    opacity: 1;
+}
+
+/* Textareas */
+textarea {
+    width: 100%;
+    min-height: 70px;
+    padding: 8px;
+    font-size: 14px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    resize: vertical;
+}
+
+/* Select inputs */
+select {
+    padding: 8px;
+    font-size: 14px;
+    border-radius: 4px;
+    border: 1px solid #ccc;
+    width: 100%;
+    margin-bottom: 12px;
+}
+
+/* Warning messages inside forms */
+#device-warning, #customer-warning, #user-warning {
+    color: red;
+    font-size: 11pt;
+    margin-bottom: 10px;
+}
+
+/* Popup headers */
+#note-form h3, #device-form h3, #customer-form h3, #user-form h3,
+#delete-popup h4, #delete-note-popup h4, #reassign-popup h4, #close-popup h4 {
+    margin-top: 0;
+    margin-bottom: 12px;
+    font-weight: bold;
+}
+
+/* Close buttons inside popups */
+#note-form button.close-btn, 
+#device-form button.close-btn, 
+#customer-form button.close-btn, 
+#user-form button.close-btn, 
+#delete-popup button.close-btn, 
+#delete-note-popup button.close-btn, 
+#reassign-popup button.close-btn, 
+#close-popup button.close-btn {
+    background-color: #666;
+    margin-bottom: 12px;
+}
+
+#note-form button.close-btn:hover,
+#device-form button.close-btn:hover,
+#customer-form button.close-btn:hover,
+#user-form button.close-btn:hover,
+#delete-popup button.close-btn:hover,
+#delete-note-popup button.close-btn:hover,
+#reassign-popup button.close-btn:hover,
+#close-popup button.close-btn:hover {
+    background-color: #444;
+}
+
+/* Checkbox label styling */
+label {
+    display: block;
+    margin-bottom: 4px;
+    font-weight: 600;
+    font-size: 14px;
+}
+
+/* Form buttons */
+form button[type="submit"] {
+    margin-top: 12px;
+    width: 100%;
+}
+
+/* Responsive tweaks */
+@media (max-width: 480px) {
+    #page {
+        margin: 10px;
+    }
+
+    #note-form, #device-form, #customer-form, #user-form, 
+    #delete-popup, #delete-note-popup, #reassign-popup, #close-popup {
+        width: 90%;
+        padding: 15px;
+    }
+}
+
+    </style>
+</head>
+<body>
+    {% include 'navbar.html' %}
+    <div id="page">
+        <div id="ticket_details">
+            <h2>Ticket: {{ticket.id}}</h2>
+            <p><strong>Time Submitted:</strong> {{ticket.time_submitted}}</p>
+            <p><strong>Summary:</strong> {{ticket.summary}}</p>
+            <p><strong>Description:</strong></p>
+            <p>{{ticket.description}}</p>
+            <p><strong>Status:</strong> {{ticket.request_statuses.Value}}</p>
+            <p><strong>User:</strong> {{ticket.created_user}}</p>
+            {% if ticket.assigned_team_member %}
+                <p><strong>Assigned To:</strong> {{ticket.assigned_team_member}}</p>
+            {% else %}
+                <p><strong>Assigned To:</strong> Not yet assigned</p>
+            {% endif %}
+            {% if ticket.devices.hostname %}
+                <p><strong>Device:</strong> {{ticket.devices.hostname}}</p>
+            {% else %}
+                <p><strong>Device:</strong> No Device Assigned</p>
+            {% endif %}
+            <p><strong>Customer:</strong> {{ticket.customers.customer_name}}</p>
+
+            {% if ticket.notes %}
+                <p><strong>Notes:</strong></p>
+                {% for note in ticket.notes %}
+                <div id="note_{{note.id}}">
+                    <p>{{note.created_at}} - {{note.body}} - {{note.users.username}}</p>
+                    <button onclick="togglePopup('delete-note-popup-{{note.id}}', true)">Delete Note</button>
+                    <div id="delete-note-popup-{{note.id}}" class="modal-popup" style="display:none;">
+                        <button onclick="togglePopup('delete-note-popup-{{note.id}}', false)">Close</button>
+                        <h4>Are you sure you wish to delete this note?</h4>
+                        <form id="note-delete-form" method="POST" action="/tickets/{{ticket.id}}/note/{{note.id}}/delete">
+                            <label><input type="checkbox" name="verify" required> Check To verify</label>
+                            <button type="submit">Delete</button>
+                        </form>
+                    </div>
+                </div>
+                {% endfor %}
+
+            {% endif %}
+        </div>
+
+        <div id="ticket-actions">
+            <button onclick="togglePopup('note-form', true)">Add note to ticket</button>
+            <div id="note-form" class="modal-popup">
+                <button class="close-btn" onclick="togglePopup('note-form', false)">&times;</button>
+                <form name="add-note-form" id="add_note_form" method="post" action="/tickets/{{ticket.id}}/addNote">
+                    <textarea name="body" placeholder="Note details" required></textarea>
+                    <button type="submit">Submit</button>
+                </form>
+            </div>
+
+            <button onclick="togglePopup('device-form', true)">Change/Add Device</button>
+            <div id="device-form" class="modal-popup">
+                <button class="close-btn" onclick="togglePopup('device-form', false)">&times;</button>
+                <form name="change-device-form" id="change-device-form" method="post" action="/tickets/{{ticket.id}}/changeDevice">
+                    <p id="device-warning">Please be aware that changing the device will change the request to be associated with the customer associated to that account.</p>
+                    <p id="device-warning">This may reassign the user to a general user for that account.</p>
+                    <select name="device_id">
+                        {% if not ticket.device_id %}
+                            <option value="" selected>No Device</option>
+                        {% else %}
+                            <option value="">No Device</option>
+                        {% endif %}
+                        {% for device in devices %}
+                            {% if ticket.device_id == device.id %}
+                                <option value="{{device.id}}" selected>{{device.hostname}}</option>
+                            {% else %}
+                                <option value="{{device.id}}">{{device.hostname}}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                    <button type="submit">Submit</button>
+                </form>
+            </div>
+
+            <button onclick="togglePopup('customer-form', true)">Change Customer</button>
+            <div id="customer-form" class="modal-popup">
+                <button class="close-btn" onclick="togglePopup('customer-form', false)">&times;</button>
+                <form name="change-customer-form" id="change-customer-form" method="post" action="/tickets/{{ticket.id}}/changeCustomer">
+                    <p id="customer-warning">Please be aware that changing the customer may remove the associated device.</p>
+                    <p id="customer-warning">This may also reassign the user to a general user for that customer.</p>
+                    <select name="customer_id">
+                        {% for customer in customers %}
+                            {% if ticket.customer_id == customer.id %}
+                                <option value="{{customer.id}}" selected>{{customer.customer_name}}</option>
+                            {% else %}
+                                <option value="{{customer.id}}">{{customer.customer_name}}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                    <button type="submit">Submit</button>
+                </form>
+            </div>
+
+            <button onclick="togglePopup('user-form', true)">Change User</button>
+            <div id="user-form" class="modal-popup">
+                <button class="close-btn" onclick="togglePopup('user-form', false)">&times;</button>
+                <form name="change-user-form" id="change-user-form" method="post" action="/tickets/{{ticket.id}}/changeUser">
+                    <p id="user-warning">Tickets can only be assigned to a user for their assigned customer.</p>
+                    <p id="user-warning">You may need to reassign the customer first.</p>
+                    <select name="user_id">
+                        {% for user in users %}
+                            {% if ticket.user_id == user.id %}
+                                <option value="{{user.id}}" selected>{{user.username}}</option>
+                            {% else %}
+                                <option value="{{user.id}}">{{user.username}}</option>
+                            {% endif %}
+                        {% endfor %}
+                    </select>
+                    <button type="submit">Submit</button>
+                </form>
+            </div>
+
+            <button onclick="togglePopup('reassign-popup', true)">Assign ticket to self</button>
+            <div id="reassign-popup" class="modal-popup">
+                <button class="close-btn" onclick="togglePopup('reassign-popup', false)">&times;</button>
+                <h4>Are you sure you wish to assign this ticket to yourself?</h4>
+                <form id="reassign-form" method="POST" action="/tickets/{{ticket.id}}/reassign">
+                    <label><input type="checkbox" name="verify" required> Check To verify</label>
+                    <button type="submit">Reassign</button>
+                </form>
+            </div>
+
+            <button onclick="togglePopup('close-popup', true)">Mark ticket as closed</button>
+            <div id="close-popup" class="modal-popup">
+                <button class="close-btn" onclick="togglePopup('close-popup', false)">&times;</button>
+                <h4>Are you sure you wish to close this?</h4>
+                <form id="close-form" method="POST" action="/tickets/{{ticket.id}}/close">
+                    <label><input type="checkbox" name="verify" required> Check To verify</label>
+                    <button type="submit">Close</button>
+                </form>
+            </div>
+
+            <button onclick="togglePopup('delete-popup', true)">Delete Ticket</button>
+            <div id="delete-popup" class="modal-popup">
+                <button class="close-btn" onclick="togglePopup('delete-popup', false)">&times;</button>
+                <h4>Are you sure you wish to delete this ticket?</h4>
+                <form id="delete-form" method="POST" action="/tickets/{{ticket.id}}/delete">
+                    <label>Check To verify<input type="checkbox" name="verify" required></label>
+                    <button type="submit">Delete</button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div id="overlay" class="modal-overlay" onclick="closeAllPopups()"></div>
+
+    <script>
+        function togglePopup(id, show) {
+            const el = document.getElementById(id);
+            const overlay = document.getElementById('overlay');
+            if (!el || !overlay) return;
+
+            if (show) {
+                el.style.display = 'block';
+                overlay.style.display = 'block';
+                // Set focus on the first focusable element inside the popup
+                const focusable = el.querySelector('input, textarea, select, button');
+                if (focusable) focusable.focus();
+            } else {
+                el.style.display = 'none';
+                // Check if any other popups still open
+                const popups = document.querySelectorAll('.modal-popup');
+                const anyOpen = Array.from(popups).some(popup => popup.style.display === 'block');
+                if (!anyOpen) {
+                    overlay.style.display = 'none';
+                }
+            }
+        }
+
+        function closeAllPopups() {
+            const popups = document.querySelectorAll('.modal-popup');
+            popups.forEach(popup => popup.style.display = 'none');
+            const overlay = document.getElementById('overlay');
+            if (overlay) overlay.style.display = 'none';
+        }
+    </script>
+</body>
+</html>

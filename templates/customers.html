@@ -1,0 +1,120 @@
+<html>
+<head>
+    <title>Search Customers</title>
+</head>
+{% include 'navbar.html' %}
+<div id="page">
+    <div id="header">
+        <h1>Search Customers</h1>
+        <p>Here you can search for customers by fields. Or leave both fields blank to return all.</p>
+    </div>
+    <div id="content">
+        <form method="POST" action="/customers">
+            <input type="text" name="customer_name" placeholder="Customer Name">
+            <input type="number" name="teir" placeholder="Customer Tier">
+            <button type="submit">Search</button>
+        </form>
+        {% if results %}
+        <h2>Search Results:</h2>
+        <table>
+            <thead>
+                <tr>
+                    <th>Customer Name</th>
+                    <th>Teir</th>
+                    <th>Number of Devices</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for customer in results %}
+                <tr>
+                    <td><a href="/customers/{{  customer.id  }}">{{ customer.customer_name }}</a></td>
+                    <td>{{ customer.teir }}</td>
+                    <td>{{ customer.device_count }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No results found.</p>
+        {% endif %}
+    </div>
+
+        <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            margin: 0;
+            padding: 0;
+        }
+
+        #page {
+            max-width: 900px;
+            margin: 2rem auto;
+            padding: 2rem;
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+
+        #header h1 {
+            margin-bottom: 0.5rem;
+            color: gray
+        }
+
+        #header p {
+            color: #555;
+            margin-bottom: 2rem;
+        }
+
+        form {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+            margin-bottom: 2rem;
+        }
+
+        input, button {
+            padding: 0.6rem 1rem;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            font-size: 1rem;
+        }
+
+        button {
+            background-color: #ffb300;
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #f6bf3e;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 1rem;
+        }
+
+        th, td {
+            padding: 0.75rem;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f0f0f0;
+        }
+
+        a {
+            color: grey;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+    </style>
+
+</html>

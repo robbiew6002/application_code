@@ -1,0 +1,193 @@
+<script>
+    function showDeletePopup() {
+        document.getElementById('delete-popup').style.display = 'block';
+        document.getElementById('overlay-blur').style.display = 'block';
+    }
+
+    function hideDeletePopup() {
+        document.getElementById('delete-popup').style.display = 'none';
+        document.getElementById('overlay-blur').style.display = 'none';
+    }
+</script>
+
+
+<html>
+<head>
+    <title>User {{ user.id }}</title>
+</head>
+<body>
+    {% include 'navbar.html' %}
+    <div id="overlay-blur" onclick="hideDeletePopup()"></div>
+    <div id="page">
+        <div id="form-container">
+        <h2>View or Edit User Details</h3>
+        <form id="user-form" method="POST" action="/users/{{user.id}}">
+            <p>User id: {{user.id}}</p>
+            <input type="email" name="username" placeholder="{{ user.username }}">
+            <label for="customer_id">Customer</label>
+            <select id="customer_id" name="customer_id" selected="{{user.customer_id}}"required>
+                {% for customer in customers %}
+                {% if customer.id == user.customer_id %}
+                <option  value="{{ customer.id }}" selected>{{ customer.customer_name }}</option>
+                {% else %}
+                <option value="{{ customer.id }}">{{ customer.customer_name }}</option>
+                {% endif %}
+                {% endfor %}
+            </select>
+            <label for="auth_level">Authorization Level</label>
+            <input type="number" name="auth_level" placeholder="{{user.auth_level}}">
+            <button type="submit">Update</button>
+        </form>
+        </div>
+        <div id="delete-button-container">
+            <button onclick="showDeletePopup()">Delete</button>
+        </div>
+        <div id="delete-popup">
+            <button onClick="hideDeletePopup()">Close</button>
+            <h4>Are you sure you wish to delete?</h4>
+            <form id="asset-delete-form" method="POST" action="/users/{{ user.id }}/delete">
+                Check to Verify
+                <input type="checkbox" name="verify" required>
+                <button type="submit">Delete</button>
+            </form>
+        </div>
+    </div>
+</body>
+
+<style>
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background-color: #f8f9fa;
+    }
+
+    #page {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 20px;
+        position: relative;
+    }
+
+    h2 {
+        margin-bottom: 20px;
+        color: gray
+    }
+
+    #form-container {
+        background-color: white;
+        padding: 20px;
+        border-radius: 10px;
+        box-shadow: 0 2px 6px rgba(0, 0, 0, 0.05);
+        margin-bottom: 30px;
+    }
+
+    #user-form {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    #user-form input,
+    #user-form select {
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        font-size: 14px;
+    }
+
+    #user-form button {
+        align-self: start;
+        background-color: #ffb300;
+        color: white;
+        border: none;
+        padding: 10px 16px;
+        border-radius: 6px;
+        cursor: pointer;
+        font-size: 14px;
+    }
+
+    #user-form button:hover {
+        background-color: #f6bf3e;
+    }
+
+    #delete-button-container {
+        margin-top: 20px;
+        text-align: left;
+    }
+
+    #delete-button-container button {
+        padding: 10px 16px;
+        background-color: #dc3545;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+
+    #delete-button-container button:hover {
+        background-color: #b52a38;
+    }
+
+    #delete-popup {
+        display: none;
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        width: 300px;
+        transform: translate(-50%, -50%);
+        background-color: white;
+        border-radius: 10px;
+        box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+        padding: 20px;
+        z-index: 1001;
+    }
+
+    #delete-popup h4 {
+        margin-bottom: 15px;
+    }
+
+    #delete-popup label {
+        display: flex;
+        align-items: center;
+        margin-bottom: 10px;
+    }
+
+    #delete-popup input[type="checkbox"] {
+        margin-left: 10px;
+        transform: scale(1.2);
+    }
+
+    #delete-popup button {
+        margin-top: 10px;
+        padding: 8px 14px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+    }
+
+    #delete-popup button:first-child {
+        background-color: #6c757d;
+        color: white;
+        margin-right: 10px;
+    }
+
+    #delete-popup button:last-child {
+        background-color: #dc3545;
+        color: white;
+    }
+
+    #overlay-blur {
+        display: none;
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100vh;
+        width: 100vw;
+        background-color: rgba(0, 0, 0, 0.3);
+        backdrop-filter: blur(2px);
+        z-index: 1000;
+    }
+</style>
+
+
+</html>

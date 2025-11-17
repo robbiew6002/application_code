@@ -1,0 +1,304 @@
+<script>
+    function showDeletePopup() {
+        document.getElementById('delete-popup').style.display = 'block';
+        document.getElementById('delete-overlay').style.display = 'block';
+    }
+
+    function hideDeletePopup() {
+        document.getElementById('delete-popup').style.display = 'none';
+        document.getElementById('delete-overlay').style.display = 'none';
+    }
+</script>
+
+<html>
+<head>
+    <title>Customer {{ customer.id }}</title>
+</head>
+<body>
+    {% include 'navbar.html' %}
+        <div id="page">
+        <h3>{{customer.customer_name}}</h3>
+        <div id="form-container"></div>
+        <form id="customer-container" method="POST" action="/customers/{{customer.id}}">
+            <input type="text" name="customer_name" placeholder="{{ customer.customer_name }}">
+            <label for="teir">Teir:</label>
+            <input type="number" id="teir" name="teir" placeholder="{{customer.teir}}">
+            </select>
+            <button type="submit">Update</button>
+        </form>
+        </div>
+        <div id="assets-and-tickets">
+            <div id="asset-container">
+                <h3>Customers Assets:</h3>
+                {% if assets %}
+                <table id="asset-table">
+                    <thead>
+                        <tr>
+                            <th>Hostname</th>
+                            <th>Device Type</th>
+                            <th>Status</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {%for asset in assets %}
+                        <tr>
+                            <td><a href="/assets/{{asset.id}}">{{asset.hostname}}</a></td>
+                            <td>{{asset.device_types.name}}</td>
+                            <td>{{asset.statuses.value}}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <a href="/create"><button>Create new asset</button></a>
+                {% else %}
+                <p>Customer has no assets configured yet. To configure one, create an asset here.</p>
+                <a href="/create"><button>Create new assets.</button></a>
+                {% endif %}
+            </div>
+            <h3>Customer Active Tickets</h3>
+            {% if tickets %}
+                <table id="ticket-table">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Summary</th>
+                            <th>Status</th>
+                            <th>Device</th>
+                            <th>Time Created</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {%for ticket in tickets %}
+                        <tr>
+                            <td><a href="/tickets/{{ticket.id}}">{{ticket.id}}</a></td>
+                            <td>{{ticket.summary}}</td>
+                            <td>{{ticket.request_statuses.Value}}</td>
+                            {% if ticket.devices %}
+                            <td>{{ticket.devices.hostname}}</td>
+                            {% else %}
+                            <td>No device assigned</td>
+                            {% endif %}
+                            <td>{{ticket.time_submitted}}</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+                <a href="/contact"><button>Create new ticket</button></a>
+                {% else %}
+                <p>Customer has no active tickets. To create a new one, click here.</p>
+                <a href="/contact"><button>Create new ticket</button></a>
+                {% endif %}
+        </div>
+        <div id="delete-button-container">
+            <button onclick="showDeletePopup()">Delete</button>
+        </div>
+        <div id="delete-overlay" onclick="hideDeletePopup()"></div>
+        <div id="delete-popup">
+            <button onclick="hideDeletePopup()">Close</button>
+            <h4>Are you sure you wish to delete?</h4>
+            <form id="asset-delete-form" method="POST" action="/customers/{{customer.id}}/delete">
+                <label>
+                    Confirm
+                    <input type="checkbox" name="verify" required>
+                </label>
+                <button type="submit">Delete</button>
+            </form>
+        </div>
+    </div>
+</body>
+
+<style>
+
+    a {
+        color: grey;
+        text-decoration: none;
+    }
+    
+    body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        background-color: #f7f7f7;
+    }
+
+    #page {
+        padding: 2rem;
+        max-width: 1000px;
+        margin: auto;
+    }
+
+    input::placeholder {
+        opacity: 1;
+        color: black;
+    }
+
+    form {
+        margin-bottom: 2rem;
+    }
+
+    input, select, button {
+        padding: 0.6rem;
+        margin: 0.5rem 0;
+        border-radius: 4px;
+        border: 1px solid #ccc;
+        font-size: 1rem;
+        display: block;
+        width: 100%;
+        max-width: 300px;
+    }
+
+    button {
+        background-color: #ffb300;
+        color: white;
+        border: none;
+        cursor: pointer;
+        width: fit-content;
+    }
+
+    button:hover {
+        background-color: #f6bf3e;
+    }
+
+    table {
+        border-collapse: collapse;
+        width: 100%;
+        max-width: 900px; /* widened from 800px */
+        margin: 2rem auto;
+        background-color: #fff;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+        overflow: hidden;
+        table-layout: auto;
+    }
+
+    th, td {
+        padding: 1rem;
+        border-bottom: 1px solid #eee;
+        text-align: left;
+        vertical-align: middle;
+    }
+
+    th {
+        background-color: #f1f1f1;
+        font-weight: bold;
+        border-bottom: 2px solid #ccc;
+    }
+
+#delete-popup {
+    display: none;
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #fefefe;
+    padding: 2rem 2.5rem;
+    border: 2px solid #ccc;
+    border-radius: 12px;
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+    z-index: 1000;
+    width: 360px;
+    max-width: 90%;
+}
+
+#delete-popup h4 {
+    margin-bottom: 1.2rem;
+    color: #c62828;
+    font-size: 1.2rem;
+    font-weight: 600;
+    text-align: center;
+}
+
+#delete-popup form {
+    display: flex;
+    flex-direction: column;
+    gap: 1.2rem;
+    align-items: flex-start;
+}
+
+#delete-popup label {
+    display: flex;
+    align-items: center;
+    font-size: 1rem;
+    gap: 0.5rem;
+}
+
+#delete-popup input[type="checkbox"] {
+    transform: scale(1.2);
+    accent-color: #c62828;
+    cursor: pointer;
+}
+
+#delete-popup button {
+    padding: 0.6rem 1.2rem;
+    background-color: #ffb300;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 1rem;
+    align-self: flex-end;
+    transition: background-color 0.3s ease;
+}
+
+#delete-popup button:hover {
+    background-color: #f6bf3e;
+}
+
+#delete-popup > button {
+    align-self: flex-end;
+    background: none;
+    color: #333;
+    border: none;
+    font-size: 0.9rem;
+    cursor: pointer;
+    margin-bottom: 0.5rem;
+    text-decoration: underline;
+}
+
+#delete-popup > button:hover {
+    color: #000;
+}
+
+    #delete-overlay {
+        display: none;
+        position: fixed;
+        z-index: 998;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        backdrop-filter: blur(4px);
+        background: rgba(0, 0, 0, 0.3);
+    }
+
+    #delete-button-container {
+        margin-top: 2rem;
+    }
+
+    #asset-container, #ticket-table, #ticket-container {
+        max-width: 900px; /* match the table width */
+        margin: 2rem auto;
+        padding: 0 1rem; /* some horizontal padding */
+    }
+
+    #asset-container h3, 
+    #ticket-table h3, 
+    #assets-and-tickets > h3 {
+        max-width: 900px;
+        margin: 2rem auto 1rem;
+        padding: 0 1rem;
+        text-align: left; 
+    }
+
+    #assets-and-tickets a button,
+    #delete-button-container button {
+        margin-left: 20px;
+    }
+
+    #assets-and-tickets,
+    #delete-button-container {
+        max-width: 900px;
+        margin: 0 auto 1rem auto; 
+}
+</style>
+
+</html>

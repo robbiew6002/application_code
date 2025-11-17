@@ -1,0 +1,147 @@
+<html>
+<head>
+    <title>Create New Record</title>
+     <style>
+
+       #header h2 {
+        margin-bottom: 5px;
+        font-size: 24px;
+        color: gray
+    }
+
+    #header h4 {
+        color: #666;
+        font-weight: normal;
+    }
+
+    h3 {
+        color: grey
+    }
+        body {
+            margin: 0 auto;
+            font-family: Arial, sans-serif;
+            background-color: #f8f9fa;
+        }
+
+        #page {
+            max-width: 1000px;
+            margin: 0 auto;
+        }
+
+        #header {
+            margin-bottom: 30px;
+        }
+
+
+        #forms {
+            display: flex;
+            gap: 40px;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        #asset-form, #customer-form {
+            flex: 1 1 400px;
+            background-color: white;
+            padding: 24px;
+            border-radius: 10px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        label {
+            margin-top: 12px;
+            font-weight: bold;
+        }
+
+        input, select {
+            padding: 10px;
+            margin-top: 5px;
+            border-radius: 6px;
+            border: 1px solid #ccc;
+            font-size: 14px;
+        }
+
+        button {
+            margin-top: 20px;
+            padding: 10px 16px;
+            background-color: #ffb300;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            font-size: 14px;
+            cursor: pointer;
+            align-self: flex-start;
+        }
+
+        button:hover {
+            background-color: #f6bf3e;
+        }
+
+        @media (max-width: 768px) {
+            #forms {
+                flex-direction: column;
+                gap: 20px;
+            }
+        }
+    </style>
+</head>
+<body>
+    {% include 'navbar.html' %}
+    <div id="page">
+        <div id="header">
+            <h2>Create New Record</h2>
+            <h4>Use the form below to create a new record</h4>
+        </div>
+        <div id="forms">
+            <div id="asset-form">
+                <h3>Create Asset</h3>
+                <form method="POST" action="/create/asset">
+                    <label for="hostname">Hostname:</label>
+                    <input type="text" id="hostname" name="hostname" required>
+
+                    <label for="type_id">Asset Type:</label>
+                    <select id="type_id" name="type_id" required>
+                        {% for type in device_types %}
+                        <option value="{{ type.id }}">{{ type.name }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <label for="status_id">Status:</label>
+                    <select id="status_id" name="status_id" required>
+                        {% for status in statuses %}
+                        <option value="{{ status.id }}">{{ status.value }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <label for="customer_id">Customer:</label>
+                    <select id="customer_id" name="customer_id" required>
+                        {% for customer in customers %}
+                        <option value="{{ customer.id }}">{{ customer.customer_name }}</option>
+                        {% endfor %}
+                    </select>
+
+                    <button type="submit">Create Asset</button>
+                </form>
+            </div>
+            <div id="customer-form">
+                <h3>Create Customer</h3>
+                <form method="POST" action="/create/customer">
+                    <label for="customer_name">Name:</label>
+                    <input type="text" id="customer_name" name="customer_name" required>
+
+                    <label for="teir">Teir:</label>
+                    <input type="number" id="teir" name="teir" required>
+
+                    <button type="submit">Create Customer</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>
+   
+</html>

@@ -1,0 +1,169 @@
+<html>
+    <head>
+        <title>User Management</title>
+    </head>
+    <body>
+    {% include 'navbar.html' %}
+        <div id="page">
+            <div id="heading">
+                <h2>User Management</h2>
+                <h4>Create or View users</h4>
+            </div>
+            <div id="Search_for_users">
+            <form method="POST" action="/users">
+                <input type="number" name="id" placeholder="User Id">
+                <input type="text" name="username" placeholder="Username">
+                <input type="text" name="customer" placeholder="Customer">
+                <input type="number" name="auth_level" placeholder="auth_level">
+                <button type="submit">Search</button>
+        </form>
+            {% if users %}
+            <table>
+            <thead>
+                <tr>
+                    <th>User Id</th>
+                    <th>Username</th>
+                    <th>Customer</th>
+                    <th>Authorization Level</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for user in users %}
+                <tr>
+                    <td><a href="/users/{{ user.id }}">{{ user.id }}</a></td>
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.customers.customer_name }}</td>
+                    <td>{{user.auth_level}}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p>No users found</p>
+            {% endif %}
+            </div>
+            <div id="create-user-btn">
+                <a href="/users/create"><button>Create New User</button></a>
+            </div>
+        </div>
+    </body>
+ <style>
+    * {
+        box-sizing: border-box;
+    }
+
+    body {
+        margin: 0;
+        font-family: Arial, sans-serif;
+        background-color: #f8f9fa;
+    }
+
+    #page {
+        max-width: 960px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    #heading {
+        margin-bottom: 20px;
+    }
+
+    #heading h2 {
+        margin-bottom: 5px;
+        font-size: 24px;
+        color: gray
+    }
+
+    #heading h4 {
+        color: grey;
+        font-weight: normal;
+    }
+
+    form {
+        background-color: #fff;
+        padding: 16px;
+        border-radius: 8px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+        display: flex;
+        flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 20px;
+        gap: 10px;
+    }
+
+    form input {
+        padding: 8px 12px;
+        font-size: 14px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+    }
+
+    form button {
+        padding: 9px 14px;
+        font-size: 14px;
+        background-color: #ffb300;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+    }
+
+    form button:hover {
+        background-color: #f6bf3e;
+    }
+
+    
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            margin-top: 15px;
+            margin-bottom: 15px;
+        }
+
+        th, td {
+        padding: 0.75rem;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    th {
+        background-color: #f0f0f0;
+        font-weight: 600;
+    }
+
+    tr:hover {
+        background-color: #f9f9f9;
+    }
+
+    #Search_for_users {
+        text-align: center;
+    }
+
+    #create-user-btn {
+        display: flex;
+        justify-content: center;
+    }
+
+    #create-user-btn a button {
+        padding: 10px 16px;
+        background-color: #ffb300;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        font-size: 14px;
+        cursor: pointer;
+    }
+
+    #create-user-btn a button:hover {
+        background-color: #f6bf3e;
+    }
+
+    a {
+        color: grey;
+        text-decoration: none;
+    }
+
+</style>
+</html>

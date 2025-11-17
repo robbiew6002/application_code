@@ -1,0 +1,257 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Contact Page</title>
+    <style>
+        body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f5f6fa;
+        color: #333;
+    }
+
+        #page {
+            max-width: 1000px;
+            margin: auto;
+        }
+
+        #heading {
+            margin-bottom: 20px;
+        }
+
+        h2, h3{
+            margin-bottom: 10px;
+            color: grey
+        }
+
+        h4 {
+            color: grey;
+            font-weight: normal;
+        }
+
+        section {
+            background-color: #fff;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-radius: 6px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        form {
+            display: flex;
+            flex-direction: column;
+        }
+
+        form input, form textarea, form select {
+            margin-bottom: 15px;
+            padding: 10px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+        }
+
+        form button {
+            padding: 10px;
+            background-color: orange;
+            color: white;
+            font-size: 14px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        form button:hover {
+            background-color: darkorange;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 14px;
+            margin-top: 15px;
+        }
+
+        th, td {
+        padding: 0.75rem;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    th {
+        background-color: #f0f0f0;
+        font-weight: 600;
+    }
+
+    tr:hover {
+        background-color: #f9f9f9;
+    }
+
+    a {
+        color: grey;
+        text-decoration: none;
+    }
+
+    a:hover {
+        text-decoration: underline;
+    }
+
+        .success-message {
+            color: green;
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    {% include 'navbar.html' %}
+    {% if session.auth_level == 1 or session.auth_level == 2 %}
+    <div id="page">
+        <div id="heading">
+            <h2>User Requests</h2>
+            <h4>Here you can view existing user requests and create new requests.</h4>
+        </div>
+
+        <!-- Ticket Creation Form -->
+        <section id="form_container">
+            <h3>Create Ticket</h3>
+            <form id="ticket-form" method="post" action="/contact">
+                <label for="summary">Summary:</label>
+                <input name="summary" type="text" placeholder="Give a brief title to the request" required>
+
+                <label for="description">Description:</label>
+                <textarea name="description" placeholder="Provide a description of your issue." required></textarea>
+
+                <label for="device_id">Related Device:</label>
+                <select name="device_id">
+                    <option value="" selected>None</option>
+                    {% for asset in assets %}
+                    <option value="{{ asset.id }}">{{ asset.hostname }}</option>
+                    {% endfor %}
+                </select>
+
+                <label for="customer_id">Related Customer:</label>
+                <select name="customer_id" required>
+                    {% for customer in customers %}
+                    <option value="{{ customer.id }}">{{ customer.customer_name }}</option>
+                    {% endfor %}
+                </select>
+
+                <button type="submit">Submit</button>
+            </form>
+            {% if request_created == True %}
+            <p class="success-message">Thanks for submitting your request.</p>
+            {% endif %}
+        </section>
+
+        <!-- Ticket Search & View -->
+        <section id="ticket_display">
+            <h3>View and Search Tickets</h3>
+            <form method="post" action="/user-requests">
+                <input type="text" name="description" placeholder="Description">
+
+                <select id="status_id" name="status_id">
+                    <option value="" selected>Status</option>
+                    {% for status in statuses %}
+                    <option value="{{ status.id }}">{{ status.Value }}</option>
+                    {% endfor %}
+                </select>
+
+                <select id="customer_id" name="customer_id">
+                    <option value="" selected>Customer</option>
+                    {% for customer in customers %}
+                    <option value="{{ customer.id }}">{{ customer.customer_name }}</option>
+                    {% endfor %}
+                </select>
+
+                <input type="text" name="user_id" placeholder="User">
+
+                <select id="device_id" name="device_id">
+                    <option value="" selected>Device</option>
+                    {% for device in devices %}
+                    <option value="{{ device.id }}">{{ device.hostname }}</option>
+                    {% endfor %}
+                </select>
+
+                <button type="submit">Search</button>
+            </form>
+
+            {% if results %}
+            <table>
+                <thead>
+                    <tr>
+                        <th>Summary</th>
+                        <th>Status</th>
+                        <th>Customer</th>
+                        <th>User</th>
+                        <th>Device</th>
+                        <th>Time Created</th>
+                        <th>Assigned To</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for ticket in results %}
+                    <tr>
+                        <td><a href="tickets/{{ ticket.id }}">{{ ticket.summary }}</a></td>
+                        <td>{{ ticket.request_statuses.Value }}</td>
+                        <td>{{ ticket.customers.customer_name }}</td>
+                        <td>{{ ticket.created_user }}</td>
+                        <td>
+                            {% if ticket.device_id %}
+                                {{ ticket.devices.hostname }}
+                            {% else %}
+                                No assigned device
+                            {% endif %}
+                        </td>
+                        <td>{{ ticket.time_submitted }}</td>
+                        <td>
+                            {% if ticket.assigned_team_member_id %}
+                                {{ ticket.assigned_team_member }}
+                            {% else %}
+                                No assigned team member
+                            {% endif %}
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+            {% else %}
+            <p>No results found</p>
+            {% endif %}
+        </section>
+    </div>
+
+    {% else %}
+    <!-- Non-admin view -->
+    <div id="page">
+        <div id="heading">
+            <h2>Contact</h2>
+            <h4>Use the form below to contact support</h4>
+        </div>
+
+        <section id="form_container">
+            <form id="public-contact-form" method="post" action="/contact">
+                <label for="summary">Summary:</label>
+                <input name="summary" type="text" placeholder="Give a brief title to the request" required>
+
+                <label for="description">Description:</label>
+                <textarea name="description" placeholder="Provide a description of your issue." required></textarea>
+
+                <label for="device_id">Related Device:</label>
+                <select name="device_id">
+                    <option value="" selected>None</option>
+                    {% for asset in assets %}
+                    <option value="{{ asset.id }}">{{ asset.hostname }}</option>
+                    {% endfor %}
+                </select>
+
+                <button type="submit">Submit</button>
+            </form>
+            {% if request_created == True %}
+            <p class="success-message">Thanks for submitting your request. We will be in contact soon.</p>
+            {% endif %}
+        </section>
+    </div>
+    {% endif %}
+</body>
+</html>

@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <title>APPLICATION ERROR</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 2rem;
+            background: #f8d7da;
+            color: #721c24;
+        }
+        #content {
+            background: #f5c6cb;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            margin-bottom: 2rem;
+        }
+        form {
+            background: #f1f1f1;
+            padding: 1rem 2rem;
+            border-radius: 8px;
+            max-width: 600px;
+        }
+        textarea {
+            width: 100%;
+            min-height: 100px;
+            margin-bottom: 1rem;
+            padding: 0.5rem;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            font-size: 1rem;
+        }
+        button {
+            background-color: #721c24;
+            color: white;
+            border: none;
+            padding: 0.75rem 1.5rem;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+        }
+        button:hover {
+            background-color: #501217;
+        }
+        p {
+            margin-top: 1rem;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div id="content">
+        <h2>An unexpected error has occurred.</h2>
+        <p>Unfortunately the site has encountered an unexpected error.</p> 
+        <p>Please use the form below to log a new request to the IT team so they can sort the issue.</p>
+        <p>Once complete, you will be redirected.</p>
+    </div>
+    <div>
+        <form action="/error" method="post">
+            <h3>Error Form</h3>
+            <textarea name="body" required>Please add a brief description of what you were trying to do.</textarea>
+            <input type="hidden" name="failed_url" value="{{ request.url }}">
+            <input type="hidden" name="failed_method" value="{{ request.method }}">
+            <button type="submit">Submit</button>
+        </form>
+        <p>Thank you</p>
+    </div>
+</body>
+</html>

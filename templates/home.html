@@ -1,0 +1,148 @@
+<html>
+<head>
+    <title>Home Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f5f7fa;
+            margin: 0;
+            margin-bottom: 20px;
+            padding: 0;
+        }
+
+        #Heading, #CustomerWelcome, #ThankYou {
+            padding: 2rem;
+            background-color: #ffffff;
+            margin: 2rem auto;
+            width: 80%;
+            border-radius: 8px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+        }
+
+        h1, h3 {
+            color: grey;
+        }
+
+        p {
+            color: #555;
+            margin: 0.5rem 0;
+        }
+
+        table {
+            justify-self: center;
+        width: 80%;
+        border-collapse: collapse;
+        margin-top: 1rem;
+    }
+
+    th, td {
+        padding: 0.75rem;
+        text-align: left;
+        border-bottom: 1px solid #ddd;
+    }
+
+    th {
+        background-color: #f0f0f0;
+        font-weight: 600;
+    }
+
+    tr:hover {
+        background-color: #f9f9f9;
+    }
+
+    a {
+        color: grey;
+        text-decoration: none;
+    }
+
+    a:hover {
+        text-decoration: underline;
+    }
+
+        button {
+            padding: 0.5rem 1rem;
+            background-color: #ffb300;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        button:hover {
+            background-color: #f6bf3e;
+        }
+    </style>
+</head>
+<body>
+    {% include 'navbar.html' %}
+
+    {% if session.auth_level == 1 or session.auth_level == 2 %}
+    <div id="Heading">
+        <h1>Welcome {{ session.username }}!</h1>
+        <p>This is the Ampito asset management and incident response system.</p>
+        <p>From this tool you can view all customer assets and respond to customer tickets.</p>
+        <p>Below is all active tickets. To view more assets or tickets, use the navbar to navigate the app.</p>
+    </div>
+
+    <div id="asset-table-container">
+        <h3 style="text-align: center;">All Unassigned Tickets</h3>
+        {% if tickets %}
+        <table>
+            <thead>
+                <tr>
+                    <th>Summary</th>
+                    <th>Status</th>
+                    <th>Customer</th>
+                    <th>User</th>
+                    <th>Device</th>
+                    <th>Time Created</th>
+                    <th>Assigned To</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for ticket in tickets %}
+                <tr>
+                    <td><a href="/tickets/{{ ticket.id }}">{{ ticket.summary }}</a></td>
+                    <td>{{ ticket.request_statuses.Value }}</td>
+                    <td>{{ ticket.customers.customer_name }}</td>
+                    <td>{{ ticket.created_user }}</td>
+                    <td>
+                        {% if ticket.device_id %}
+                            <a href="/assets/{{ticket.device_id}}">{{ ticket.devices.hostname }}</a>
+                        {% else %}
+                            No assigned device
+                        {% endif %}
+                    </td>
+                    <td>{{ ticket.time_submitted }}</td>
+                    <td>
+                        {% if ticket.assigned_team_member_id %}
+                            {{ ticket.assigned_team_member }}
+                        {% else %}
+                            No assigned team member
+                        {% endif %}
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        {% else %}
+        <p style="text-align: center;">No Active Tickets</p>
+        {% endif %}
+    </div>
+
+    {% else %}
+    <div id="CustomerWelcome">
+        <h1>Welcome {{ session.username }}!</h1>
+        <p>This is the Ampito asset management and incident response system.</p>
+        <p>From this tool you can view your assets and log tickets with the Ampito team.</p>
+        <p>Below is all active tickets. To view more assets or tickets, use the navbar to navigate the app.</p>
+        <p>You can use the navbar on the top of this page to access all the features of the site.</p>
+        <p><a href="/tickets/new"><button>Submit a New Ticket</button></a></p>
+    </div>
+
+    <div id="ThankYou">
+        <h3>Thank you for being a valued Ampito Customer!</h3>
+    </div>
+    {% endif %}
+</body>
+</html>
