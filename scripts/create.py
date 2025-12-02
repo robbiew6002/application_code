@@ -13,7 +13,10 @@ def add_customer_to_database(customer_dict):
     print(response.data)
     return response.data[0]
 
-def add_user_to_database(user_dict):
+def add_user_to_database(user_dict,bcrypt):
+    hashed_password=bcrypt.generate_password_hash(user_dict["password"]).decode("utf-8")
+    user_dict=dict(user_dict)
+    user_dict["password"]=hashed_password
     response=supabase.table("users").insert(user_dict).execute()
     print(response.data)
     return response.data[0]

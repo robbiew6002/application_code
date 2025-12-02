@@ -6,6 +6,7 @@ import sys
 sys.path.append('./scripts')
 from flask import Flask, session, redirect, url_for, request, render_template
 from supabaseClient import supabase
+from flask_bcrypt import Bcrypt
 
 # The below modules are files created within this application to implement modularity into the code.
 from auth import check_credentials
@@ -17,6 +18,7 @@ from delete import delete_asset_by_id, delete_customer_by_id, delete_user_by_id,
 # Set up new flask app. The application is provided a name equal to the primary file (index). The application is then passed a 
 # secret key from the environment variables set in the terminal running the application
 app = Flask(__name__)
+bcrypt=Bcrypt(app)
 app.secret_key='56ca809dc0b69a58c4d278ee41b44da5ea645163ec7d3a0ab9a1c37f63aec318d0f775ce8a11e5e336ac6023132bdf242453ed1bb12c8bfac6584f2c77d3d04de8a4149eb29b5f93a8042a397b0143623b3097a6a0d6fe8b0e94fd41f6b9c61d323e82cdcea7c7ddca9eb3460acfa1bc34fa3fd09bd82758a6201172a8479925c2518e014d03230ac75c3889adafae1f43245ceb8aefa488966611066d14854bb1b1cf492fd345b20e533e63688f6ab0c442f104557b1d299981a6a7f9ca3e08985c5623c340147e7ba9cfbb8310ce9ced434c2a4b49d781cbbfe1a7d9ddaea83bb24b5c73cdef0a8773cf2a6265bad46fab6d6ecfa0992dc2fd70b887f32267'
 
 # The following establishes routes for the application. Each @app.route is provided a url endpoint on which to serve its function.
@@ -38,7 +40,7 @@ def index():
 @app.route('/login', methods=['POST'])
 def user_login():
     if not session.get('logged_in'):
-        check_credentials(request.form)
+        check_credentials(request.form, bcrypt)
     if session.get('logged_in'):
         return redirect(url_for('home'))
     return redirect(url_for('index'))
@@ -236,7 +238,7 @@ def create_user():
         return render_template("create_user.html", 
         customers=supabase.table("customers").select("id", "customer_name").execute().data)
     if request.method == 'POST':
-        user_details=add_user_to_database(request.form)
+        user_details=add_user_to_database(request.form, bcrypt)
         return redirect(f"/users/{user_details['id']}")
         
 # Delete User Route - This route is used to delete an customer from the database. It is only usable by a user with

@@ -3,14 +3,14 @@ import os
 from supabaseClient import supabase
 from flask import session
 
-def check_credentials(user_details):
+def check_credentials(user_details, bcrypt):
     response = (
     supabase.table("users")
     .select("*")
     .execute()
     )
     for user in response.data:
-        if user['username'] == user_details['username'] and user['password'] == user_details['password']:
+        if user['username'] == user_details['username'] and (bcrypt.check_password_hash(user['password'], user_details['password'])):
             print(user)
             session['logged_in'] = True
             session['user_id'] = user['id']
