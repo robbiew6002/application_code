@@ -4,7 +4,7 @@
 # The below modules are installed via pip and are pre-made packages.
 import sys
 sys.path.append('./scripts')
-from flask import Flask, session, redirect, url_for, request, render_template
+from flask import Flask, session, redirect, url_for, request, render_template, flash
 from supabaseClient import supabase
 from flask_bcrypt import Bcrypt
 
@@ -28,6 +28,7 @@ app.secret_key='56ca809dc0b69a58c4d278ee41b44da5ea645163ec7d3a0ab9a1c37f63aec318
 # then they are forwarded to home.
 @app.route("/")
 def index():
+    print(session)
     if not session.get('logged_in'):
         return render_template("login.html")
     else:
@@ -43,6 +44,7 @@ def user_login():
         check_credentials(request.form, bcrypt)
     if session.get('logged_in'):
         return redirect(url_for('home'))
+    flash('Incorrect username/password', 'error')
     return redirect(url_for('index'))
 
 # Home Route - This route simply renders the application home page.

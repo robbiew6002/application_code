@@ -11,6 +11,14 @@
         <div class="form-group">
             <button type="submit" value="Submit">Login</button>
         </div>
+        {% with messages = get_flashed_messages(with_categories=False) %}
+        {% if messages %}
+            {%for message in messages%}
+                <p id="incorrect-message">{{ message }}</p>
+            {% endfor %}
+        {% else %}
+        {% endif %}
+    {% endwith %}
     </form>
 </body>
 
@@ -72,5 +80,10 @@
 
     button:hover {
         background-color: #f6bf3e;
+    }
+
+    #incorrect-message{
+        text-align: center;
+        font-size: 13pt;
     }
 </style>
