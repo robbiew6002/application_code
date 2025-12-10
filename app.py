@@ -95,11 +95,11 @@ def create_app():
         if not session.get('logged_in'):
             return redirect(url_for('index'))
         if (session['auth_level'] != 2 and session['auth_level'] != 1):
-            return redirect(url_for('display_assets'))
+            return redirect(url_for('assets'))
         asset_details=return_asset_by_id(asset_id)
         if request.method == 'GET':
             if not asset_details:
-                return redirect(url_for('display_assets'))
+                return redirect(url_for('assets'))
             return render_template("single_asset.html", asset=asset_details,
                 device_types=supabase.table("device_types").select("id", "name").execute().data,
                 statuses=supabase.table("statuses").select("id", "value").execute().data,
