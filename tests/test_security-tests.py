@@ -42,4 +42,4 @@ def test_auth_levels(client):
         print(session)
         device_response=client.get("/assets/17", follow_redirects=True)
         user_response=client.get("/users", follow_redirects=True)
-        assert device_response.request.path == '/assets' and user_response.request.path != "/home"
+        assert device_response.request.path == '/assets' and user_response.request.path == "/home"
