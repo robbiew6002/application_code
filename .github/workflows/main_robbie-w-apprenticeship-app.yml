@@ -2,7 +2,7 @@
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 # More info on Python, GitHub Actions, and Azure App Service: https://aka.ms/python-webapps-actions
 
-name: Build and deploy Python app to Azure Web App - robbie-w-apprenticeship-app
+name: Build and deploy Python app to Azure Web App - Robbie-W-Apprenticeship-App
 
 on:
   push:
@@ -31,6 +31,12 @@ jobs:
           python -m venv antenv
           source antenv/bin/activate
           pip install -r requirements.txt
+          pytest
+        env:
+          USER: ${{ secrets.ADMIN_USERNAME }}
+          PASSWORD: ${{ secrets.ADMIN_PASSWORD }}
+          CONNELLS_USER: ${{ secrets.CONNELLS_USERNAME }}
+          CONNELLS_PASSWORD: ${{ secrets.CONNELLS_PASSWORD }}
                 
       # By default, when you enable GitHub CI/CD integration through the Azure portal, the platform automatically sets the SCM_DO_BUILD_DURING_DEPLOYMENT application setting to true. This triggers the use of Oryx, a build engine that handles application compilation and dependency installation (e.g., pip install) directly on the platform during deployment. Hence, we exclude the antenv virtual environment directory from the deployment artifact to reduce the payload size. 
       - name: Upload artifact for deployment jobs
@@ -63,14 +69,14 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_517178C3671C46478920F2E281CF9052 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_52C39DF46764466E94333A4A0F8F18A3 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_6883A46BD43C48CEA943735EAD00FBAE }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_9A9C2EF3EB8041E8A28538FC4DA2DD8A }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_3034AB8797BB431D8CB5DDC4CD104D06 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_D187C64125B14292A6F4707176F79CDB }}
 
       - name: 'Deploy to Azure Web App'
         uses: azure/webapps-deploy@v3
         id: deploy-to-webapp
         with:
-          app-name: 'robbie-w-apprenticeship-app'
+          app-name: 'Robbie-W-Apprenticeship-App'
           slot-name: 'Production'
           
