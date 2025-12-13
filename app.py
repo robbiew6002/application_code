@@ -463,3 +463,7 @@ def create_app():
         return render_template("invalid_method.html")
     
     return app
+
+if __name__ == "__main__":
+    app=create_app()
+    app.run()
